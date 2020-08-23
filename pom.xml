@@ -16,7 +16,7 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <url>https://github.com/ScorchedPsyche</url>
+    <url>https://github.com/ScorchedPsyche/craftera_suite-wandering_trades</url>
 
     <build>
         <plugins>

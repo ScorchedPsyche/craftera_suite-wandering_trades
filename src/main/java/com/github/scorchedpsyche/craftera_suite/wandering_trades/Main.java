@@ -19,7 +19,6 @@ public final class Main extends JavaPlugin
     @Override
     public void onEnable()
     {
-
         createCustomConfig();
     }
 
@@ -30,10 +29,15 @@ public final class Main extends JavaPlugin
     }
 
     private void createCustomConfig() {
-        customConfigFile = new File(getDataFolder(), "custom.yml");
+        customConfigFile = new File(getDataFolder(), "trades.yml");
         if (!customConfigFile.exists()) {
-            customConfigFile.getParentFile().mkdirs();
-            saveResource("custom.yml", false);
+            boolean wasSuccessful = customConfigFile.getParentFile().mkdirs();
+
+            if (!wasSuccessful) {
+                System.out.println("Trade list file creation was not successful.");
+            } else {
+                saveResource("trades.yml", false);
+            }
         }
 
         customConfig= new YamlConfiguration();
