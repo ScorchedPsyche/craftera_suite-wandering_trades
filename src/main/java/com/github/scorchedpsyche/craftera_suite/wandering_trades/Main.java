@@ -33,17 +33,16 @@ public final class Main extends JavaPlugin
         if (!customConfigFile.exists()) {
             boolean wasSuccessful = customConfigFile.getParentFile().mkdirs();
 
-            if (!wasSuccessful) {
-                System.out.println("Trade list file creation was not successful.");
-            } else {
-                saveResource("trades.yml", false);
-            }
+            saveResource("trades.yml", false);
+            Bukkit.getConsoleSender().sendMessage("[CraftEra Suite - Wandering Trades] New trade config file was " +
+                                                          "created");
         }
 
-        customConfig= new YamlConfiguration();
+        customConfig = new YamlConfiguration();
         try {
             customConfig.load(customConfigFile);
         } catch (IOException | InvalidConfigurationException e) {
+            Bukkit.getConsoleSender().sendMessage("[CraftEra Suite - Wandering Trades] TRADE LIST FILE NOT FOUND");
             e.printStackTrace();
         }
     }
