@@ -1,4 +1,4 @@
-name: CraftEra Suite - Wandering Trades
+name: craftera_suite-wandering_trades
 version: ${project.version}
 main: com.github.scorchedpsyche.craftera_suite.wandering_trades.Main
 api-version: 1.16
