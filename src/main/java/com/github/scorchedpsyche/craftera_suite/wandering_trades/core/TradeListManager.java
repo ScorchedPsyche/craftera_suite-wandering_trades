@@ -11,9 +11,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 
-public class tradeListManager
+public class TradeListManager
 {
-    public tradeListManager(Main plugin)
+    public TradeListManager(Main plugin)
     {
         this.plugin = plugin;
         setup();

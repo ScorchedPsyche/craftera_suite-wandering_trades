@@ -7,10 +7,10 @@ public class TradeEntryModel
 {
     @SerializedName("type")
     @Expose
-    private String type;
+    private String type = "sell";
     @SerializedName("minecraft_id")
     @Expose
-    private String minecraftId;
+    private String minecraftId = "elytra";
     @SerializedName("owner_id")
     @Expose
     private String ownerId;
@@ -19,13 +19,13 @@ public class TradeEntryModel
     private String texture;
     @SerializedName("amount")
     @Expose
-    private Integer amount;
+    private Integer amount = 1;
     @SerializedName("price_item1")
     @Expose
-    private String priceItem1;
+    private String priceItem1 = "elytra";
     @SerializedName("price1")
     @Expose
-    private Integer price1;
+    private Integer price1 = 64;
     @SerializedName("price_item2")
     @Expose
     private String priceItem2;
@@ -34,16 +34,16 @@ public class TradeEntryModel
     private Integer price2;
     @SerializedName("uses")
     @Expose
-    private Integer uses;
+    private Integer uses = 0;
     @SerializedName("uses_max")
     @Expose
-    private Integer usesMax;
+    private Integer usesMax = 1;
     @SerializedName("experience_reward")
     @Expose
-    private Integer experienceReward;
+    private Integer experienceReward = 0;
     @SerializedName("price_multiplier")
     @Expose
-    private Integer priceMultiplier;
+    private Integer priceMultiplier = 0;
 
     public String getType() {
         return type;

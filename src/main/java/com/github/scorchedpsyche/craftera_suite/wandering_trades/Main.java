@@ -1,34 +1,27 @@
 package com.github.scorchedpsyche.craftera_suite.wandering_trades;
 
-import com.github.scorchedpsyche.craftera_suite.wandering_trades.core.tradeListManager;
+import com.github.scorchedpsyche.craftera_suite.wandering_trades.core.TradeListManager;
 import com.github.scorchedpsyche.craftera_suite.wandering_trades.listeners.WanderingTraderSpawnListener;
-import com.github.scorchedpsyche.craftera_suite.wandering_trades.models.PlayerProfileModel;
-import com.google.gson.Gson;
 import com.mojang.authlib.GameProfile;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.configuration.file.FileConfiguration;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.WanderingTrader;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 public final class Main extends JavaPlugin
 {
 //    public static Main plugin;
-    public static tradeListManager tradeList;
+    public static TradeListManager tradeList;
     public static FileConfiguration config;
     public static List<GameProfile> playerProfiles;
     public static List<ItemStack> whitelistedPlayerHeads;
@@ -42,7 +35,7 @@ public final class Main extends JavaPlugin
         playerProfiles = new ArrayList<>();
         this.saveDefaultConfig();
         config = getConfig();
-        tradeList = new tradeListManager(this);
+        tradeList = new TradeListManager(this);
 
         getServer().getPluginManager().registerEvents(new WanderingTraderSpawnListener(), this);
 
