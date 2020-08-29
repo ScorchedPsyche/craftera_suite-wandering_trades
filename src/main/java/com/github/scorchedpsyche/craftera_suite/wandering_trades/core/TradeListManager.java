@@ -5,11 +5,12 @@ import com.github.scorchedpsyche.craftera_suite.wandering_trades.models.TradeEnt
 import com.github.scorchedpsyche.craftera_suite.wandering_trades.models.TradeModel;
 import com.google.gson.Gson;
 import org.bukkit.Bukkit;
-import org.bukkit.configuration.file.FileConfiguration;
 
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.util.Arrays;
+import java.util.Collections;
 
 public class TradeListManager
 {
@@ -25,30 +26,29 @@ public class TradeListManager
     private File listsFolder;
 
     private Main plugin;
-    private File tradeListFile;
-    private FileConfiguration tradeList;
 
     public void loadFiles()
     {
-        for( File file : listsFolder.listFiles() )
+        File[] files = listsFolder.listFiles();
+        if( files != null )
         {
-            try
-            {
-                TradeEntryModel[] json = new Gson().fromJson(new FileReader(file), TradeEntryModel[].class);
-
-                if( json != null )
+            Arrays.stream(files).forEach(file -> {
+                try
                 {
-                    for( TradeEntryModel trade : json)
-                    {
-                        Trades.offers.add(trade);
-                    }
+                    TradeEntryModel[] json = new Gson().fromJson(new FileReader(file), TradeEntryModel[].class);
 
-                    Bukkit.getConsoleSender().sendMessage(
-                            "[CraftEra Suite - Wandering Trades] Loaded file: " + file.getName() );
+                    if (json != null)
+                    {
+                        Collections.addAll(Trades.offers, json);
+
+                        Bukkit.getConsoleSender().sendMessage(
+                                "[CraftEra Suite - Wandering Trades] Loaded file: " + file.getName());
+                    }
+                } catch (FileNotFoundException ex)
+                {
+                    ex.printStackTrace();
                 }
-            } catch ( FileNotFoundException ex){
-                ex.printStackTrace();
-            }
+            });
         }
     }
 

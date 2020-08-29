@@ -6,16 +6,16 @@ import com.mojang.authlib.GameProfile;
 import com.mojang.authlib.properties.Property;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
-import org.bukkit.OfflinePlayer;
-import org.bukkit.craftbukkit.v1_16_R2.inventory.CraftMerchant;
-import org.bukkit.entity.Entity;
 import org.bukkit.entity.WanderingTrader;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.MerchantRecipe;
 import org.bukkit.inventory.meta.SkullMeta;
 
 import java.lang.reflect.Field;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.UUID;
 
 public class MerchantManager
 {
@@ -28,40 +28,62 @@ public class MerchantManager
     {
         List<MerchantRecipe> trades = new ArrayList<>();
 
-        System.out.print("====================================================");
+        // Loops through trade files
         for( TradeEntryModel trade : Main.tradeList.Trades.offers )
         {
-            System.out.print(trade.getMinecraftId());
             if( !trade.getMinecraftId().equalsIgnoreCase("player_head") )
             {
-                // Other items
-                MerchantRecipe recipe = new MerchantRecipe(
-                        new ItemStack(
-                                Material.matchMaterial(trade.getMinecraftId()),
-                                trade.getAmount()),
-                        trade.getUsesMax()
-                );
+                Material material = Material.matchMaterial( trade.getMinecraftId() );
 
-                recipe.addIngredient(new ItemStack(
-                        Material.matchMaterial(trade.getPriceItem1()),
-                        trade.getPrice1()));
-
-                if ( trade.getPriceItem2() != null && trade.getPrice2() != null )
+                // Check if material exists
+                if( material != null )
                 {
-                    recipe.addIngredient(new ItemStack(
-                            Material.matchMaterial(trade.getPriceItem2()),
-                            trade.getPrice2()));
+                    // OTHER ITEMS
+                    MerchantRecipe recipe = new MerchantRecipe(
+                            new ItemStack(
+                                    material,
+                                    trade.getAmount()),
+                            trade.getUsesMax()
+                    );
+
+                    material = Material.matchMaterial(trade.getPriceItem1());
+                    if( material != null )
+                    {
+                        recipe.addIngredient(new ItemStack(
+                                material,
+                                trade.getPrice1()));
+
+                        if ( trade.getPriceItem2() != null && trade.getPrice2() != null )
+                        {
+                            material = Material.matchMaterial(trade.getPriceItem2());
+                            if( material != null )
+                            {
+                                recipe.addIngredient(new ItemStack(
+                                        material,
+                                        trade.getPrice2()));
+                            } else {
+                                Bukkit.getConsoleSender().sendMessage(
+                                        "[CraftEra Suite - Wandering Trades] " +
+                                        "ERROR on 'price_item2' of " + trade.getMinecraftId() +
+                                        ". Item was added only with Item 1." );
+                            }
+                        }
+                        trades.add( recipe );
+                    } else {
+                        Bukkit.getConsoleSender().sendMessage("[CraftEra Suite - Wandering Trades] " +
+                                                                "ERROR on 'price_item1' of " + trade.getMinecraftId() +
+                                                                ". Item was not added." );
+                    }
                 }
-                trades.add( recipe );
             } else {
                 if( trade.getOwnerId() != null && trade.getTexture() != null )
                 {
-                    // Player Head
-                    System.out.print( "OWNER: " + trade.getOwnerId());
+                    // PLAYER HEAD
 
                     ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
                     SkullMeta meta = (SkullMeta) playerHead.getItemMeta();
-                    meta.setOwningPlayer( Bukkit.getPlayerExact( trade.getOwnerId() ) );
+                    assert meta != null;
+                    meta.setOwningPlayer(Bukkit.getPlayerExact(trade.getOwnerId()));
                     playerHead.setItemMeta( meta );
 
                     MerchantRecipe recipe = new MerchantRecipe(
@@ -75,19 +97,19 @@ public class MerchantManager
 
                     trades.add( recipe );
                 } else {
-                    // Decoration Head
+                    // DECORATION HEAD
 
                     ItemStack decorationHead = new ItemStack(Material.PLAYER_HEAD, 1);
 
                     SkullMeta decorationHeadMeta = (SkullMeta) decorationHead.getItemMeta();
                     GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-//                    byte[] encodedData = Base64.encodeBase64(String.format("{textures:{SKIN:{url:\"%s\"}}}", url).getBytes());
                     profile.getProperties().put(
                             "textures",
                             new Property("textures", trade.getTexture()));
-                    Field profileField = null;
+                    Field profileField;
 
                     try {
+                        assert decorationHeadMeta != null;
                         profileField = decorationHeadMeta.getClass().getDeclaredField("profile");
                         profileField.setAccessible(true);
                         profileField.set(decorationHeadMeta, profile);
@@ -101,18 +123,37 @@ public class MerchantManager
                             trade.getUsesMax()
                     );
 
-                    recipe.addIngredient(new ItemStack(
-                            Material.matchMaterial( trade.getPriceItem1() ),
-                            trade.getPrice1()));
-
-                    if( trade.getPriceItem2() != null && trade.getPrice2() != null )
+                    Material material = Material.matchMaterial( trade.getPriceItem1() );
+                    if( material != null )
                     {
                         recipe.addIngredient(new ItemStack(
-                                Material.matchMaterial( trade.getPriceItem2() ),
-                                trade.getPrice2()));
-                    }
+                                material,
+                                trade.getPrice1()));
 
-                    trades.add( recipe );
+                        if( trade.getPriceItem2() != null && trade.getPrice2() != null )
+                        {
+                            material = Material.matchMaterial( trade.getPriceItem2() );
+
+                            if( material != null )
+                            {
+                                recipe.addIngredient(new ItemStack(
+                                        material,
+                                        trade.getPrice2()));
+                            } else {
+                                Bukkit.getConsoleSender().sendMessage(
+                                        "[CraftEra Suite - Wandering Trades] " +
+                                        "ERROR on 'price_item2' of " + trade.getMinecraftId() +
+                                        ". Item was added only with Item 1." );
+                            }
+                        }
+
+                        trades.add( recipe );
+                    } else {
+                        Bukkit.getConsoleSender().sendMessage(
+                            "[CraftEra Suite - Wandering Trades] " +
+                            "ERROR on 'price_item1' of " + trade.getMinecraftId() +
+                            ". Item was not added." );
+                    }
                 }
             }
         }
@@ -123,188 +164,59 @@ public class MerchantManager
         if( Main.config.getBoolean("whitelist.enable_synchronization") ) // TO DO
         {
 //            Bukkit.getScheduler().runTaskAsynchronously(Main.getPlugin(Main.class), () -> {
-                Collections.shuffle( Main.whitelistedPlayerHeads );
+            Collections.shuffle(Main.whitelistedPlayerHeads);
 
-                for( int i = 0; i < Main.config.getInt("whitelist.number_of_player_head_offers"); i++ )
-                {
-                    // Item Reward
-                    MerchantRecipe recipe = new MerchantRecipe(
-                            Main.whitelistedPlayerHeads.get(i),
-                            0,
-                            Main.config.getInt("whitelist.maximum_number_of_trades"),
-                            Main.config.getBoolean("whitelist.experience_rewarded_for_each_trade")
-                    );
-
-                    // Item 1
-                    if( Main.config.contains("whitelist.price.item1") )
-                    {
-                        recipe.addIngredient(new ItemStack(
-                                Material.matchMaterial( Main.config.getString("whitelist.price.item1.minecraft_id") ),
-                                Main.config.getInt("whitelist.price.item1.quantity")));
-                    }
-
-                    // Item 2
-                    if( Main.config.contains("whitelist.price.item2") )
-                    {
-                        recipe.addIngredient(new ItemStack(
-                                Material.matchMaterial( Main.config.getString("whitelist.price.item2.minecraft_id") ),
-                                Main.config.getInt("whitelist.price.item2.quantity")));
-                    }
-
-                    trades.add( recipe );
-                }
-
-//                Bukkit.getScheduler().runTask(Main.getPlugin(Main.class), () -> {
-                    merchant.setRecipes( trades );
-//                });
-//            });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//            List<OfflinePlayer> playersList = new ArrayList<>( Bukkit.getWhitelistedPlayers() );
-////            Collections.shuffle(playersList);
-//            Collections.shuffle( Main.whitelistedPlayerHeads );
-//
-//            for( int i = 0; i < Main.config.getInt("whitelist.number_of_player_head_offers"); i++ )
-//            {
-////                OfflinePlayer randomPlayer = playersList.get( i );
-////
-////                ItemStack playerHead = new ItemStack(
-////                        Material.PLAYER_HEAD,
-////                        Main.config.getInt("whitelist.heads_rewarded_per_trade"));
-////
-////                SkullMeta meta = (SkullMeta) playerHead.getItemMeta();
-////                meta.setOwningPlayer( randomPlayer );
-////                playerHead.setItemMeta( meta );
-//
-//                // Item Reward
-//                MerchantRecipe recipe = new MerchantRecipe(
-//                        Main.whitelistedPlayerHeads.get(i),
-//                        0,
-//                        Main.config.getInt("whitelist.maximum_number_of_trades"),
-//                        Main.config.getBoolean("whitelist.experience_rewarded_for_each_trade")
-//                );
-//
-//                // Item 1
-//                if( Main.config.contains("whitelist.price.item1") )
-//                {
-//                    recipe.addIngredient(new ItemStack(
-//                            Material.matchMaterial( Main.config.getString("whitelist.price.item1.minecraft_id") ),
-//                            Main.config.getInt("whitelist.price.item1.quantity")));
-//                }
-//
-//                // Item 2
-//                if( Main.config.contains("whitelist.price.item2") )
-//                {
-//                    recipe.addIngredient(new ItemStack(
-//                            Material.matchMaterial( Main.config.getString("whitelist.price.item2.minecraft_id") ),
-//                            Main.config.getInt("whitelist.price.item2.quantity")));
-//                }
-//
-//                trades.add( recipe );
-//            }
-//
-//
-//
-////            for ( OfflinePlayer player : Bukkit.getWhitelistedPlayers() )
-////            {
-////                ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
-////                SkullMeta meta = (SkullMeta) playerHead.getItemMeta();
-////                meta.setOwningPlayer( player );
-////                playerHead.setItemMeta( meta );
-////
-////                MerchantRecipe recipe = new MerchantRecipe(
-////                        playerHead,
-////                        64
-////                );
-////
-////                recipe.addIngredient(new ItemStack(
-////                        Material.DIAMOND,
-////                        1));
-////
-////                trades.add( recipe );
-////            }
-        }
-//
-//        Runnable updateRecipesTask = new Runnable()
-//        {
-//            @Override
-//            public void run()
-//            {
-//                merchant.setRecipes( trades );
-//            }
-//        };
-////
-////        Thread thread = new Thread() {
-////            public void run() {
-////                merchant.setRecipes( trades );
-////            }
-////        };
-////        thread.start();
-//
-//        Bukkit.getScheduler().runTaskAsynchronously( Main.getPlugin(Main.class), updateRecipesTask );
-////        Bukkit.getScheduler().scheduleSyncDelayedTask( Main.getPlugin(Main.class), updateRecipesTask );
-    }
-
-    private static void addItemOffers(List<MerchantRecipe> trades)
-    {
-        for( TradeEntryModel trade : Main.tradeList.Trades.offers )
-        {
-            MerchantRecipe recipe = new MerchantRecipe(
-                    new ItemStack(
-                            Material.matchMaterial(trade.getMinecraftId()),
-                            trade.getAmount()),
-                    trade.getUsesMax()
-            );
-
-            recipe.addIngredient(new ItemStack(
-                    Material.matchMaterial(trade.getPriceItem1()),
-                    trade.getPrice1()));
-
-            if ( trade.getPriceItem2() != null && trade.getPrice2() != null )
+            for (int i = 0; i < Main.config.getInt("whitelist.number_of_player_head_offers"); i++)
             {
-                recipe.addIngredient(new ItemStack(
-                        Material.matchMaterial(trade.getPriceItem2()),
-                        trade.getPrice2()));
+                // Item Reward
+                MerchantRecipe recipe = new MerchantRecipe(
+                        Main.whitelistedPlayerHeads.get(i),
+                        0,
+                        Main.config.getInt("whitelist.maximum_number_of_trades"),
+                        Main.config.getBoolean("whitelist.experience_rewarded_for_each_trade")
+                );
+
+                // Item 1
+                if (    Main.config.contains("whitelist.price.item1") &&
+                        Main.config.contains("whitelist.price.item1.minecraft_id") )
+                {
+                    Material material = Material.matchMaterial(
+                            Main.config.getString("whitelist.price.item1.minecraft_id" ) );
+                    if( material != null )
+                    {
+                        recipe.addIngredient(new ItemStack(
+                                material,
+                                Main.config.getInt("whitelist.price.item1.quantity")));
+
+                        // Item 2
+                        if (    Main.config.contains("whitelist.price.item2") &&
+                                Main.config.contains("whitelist.price.item2.minecraft_id") )
+                        {
+                            material = Material.matchMaterial(Main.config.getString("whitelist.price.item2" +
+                                                                                            ".minecraft_id"));
+                            if( material != null  )
+                            {
+                                recipe.addIngredient(new ItemStack(
+                                        material,
+                                        Main.config.getInt("whitelist.price.item2.quantity")));
+                            }
+                        } else {
+                            Bukkit.getConsoleSender().sendMessage(
+                                    "[CraftEra Suite - Wandering Trades] " +
+                                            "ERROR on config file: whitelist.price.item2.minecraft_id. Item ID is " +
+                                            "wrong." );
+                        }
+
+                        trades.add(recipe);
+                    } else {
+                        Bukkit.getConsoleSender().sendMessage(
+                                "[CraftEra Suite - Wandering Trades] " +
+                                        "ERROR on config file: whitelist.price.item1.minecraft_id. Item ID is wrong." );
+                    }
+                }
             }
-            trades.add( recipe );
+
+            merchant.setRecipes(trades);
         }
-    }
-
-    private static void addPlayerHeadOffers(List<MerchantRecipe> trades)
-    {
-        ItemStack playerHead = new ItemStack(Material.PLAYER_HEAD, 1);
-        SkullMeta meta = (SkullMeta) playerHead.getItemMeta();
-        meta.setOwningPlayer(Bukkit.getPlayerExact("ScorchedPsyche"));
-        playerHead.setItemMeta( meta );
-
-        MerchantRecipe recipe = new MerchantRecipe(
-                playerHead,
-                1
-        );
-
-        recipe.addIngredient(new ItemStack(
-                Material.DIAMOND,
-                1));
-
-        trades.add( recipe );
     }
 }

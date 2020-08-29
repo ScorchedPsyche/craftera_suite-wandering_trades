@@ -1,3 +1,4 @@
+remove_default_trades: true
 
 whitelist:
   enable_synchronization: true
