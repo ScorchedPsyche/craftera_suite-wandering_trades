@@ -6,7 +6,7 @@
 
     <groupId>com.github.scorchedpsyche</groupId>
     <artifactId>craftera_suite-wandering_trades</artifactId>
-    <version>0.0.0</version>
+    <version>0.0.1</version>
     <packaging>jar</packaging>
 
     <name>CraftEra Suite - Wandering Trades</name>

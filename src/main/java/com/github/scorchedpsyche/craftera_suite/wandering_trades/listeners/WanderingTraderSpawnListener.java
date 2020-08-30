@@ -14,7 +14,7 @@ public class WanderingTraderSpawnListener implements Listener
     {
         if ( event.getEntity().getType() == EntityType.WANDERING_TRADER )
         {
-            CraftEraSuiteWanderingTrades.merchantManager.setMerchantTrades((WanderingTrader) event.getEntity());
+            CraftEraSuiteWanderingTrades.merchantManager.setMerchantTrades( (WanderingTrader) event.getEntity() );
         }
     }
 }
