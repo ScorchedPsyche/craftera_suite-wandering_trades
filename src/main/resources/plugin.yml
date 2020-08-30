@@ -1,6 +1,7 @@
 name: craftera_suite-wandering_trades
 version: ${project.version}
-main: com.github.scorchedpsyche.craftera_suite.wandering_trades.Main
+depend: [craftera_suite-core]
+main: com.github.scorchedpsyche.craftera_suite.wandering_trades.CraftEraSuiteWanderingTrades
 api-version: 1.16
 prefix: CraftEra Suite - Wandering Trades
 authors: [ScorchedPsyche]

@@ -1,6 +1,6 @@
 package com.github.scorchedpsyche.craftera_suite.wandering_trades.core;
 
-import com.github.scorchedpsyche.craftera_suite.wandering_trades.Main;
+import com.github.scorchedpsyche.craftera_suite.wandering_trades.CraftEraSuiteWanderingTrades;
 import com.github.scorchedpsyche.craftera_suite.wandering_trades.models.TradeEntryModel;
 import com.github.scorchedpsyche.craftera_suite.wandering_trades.models.TradeModel;
 import com.google.gson.Gson;
@@ -14,7 +14,7 @@ import java.util.Collections;
 
 public class TradeListManager
 {
-    public TradeListManager(Main plugin)
+    public TradeListManager(CraftEraSuiteWanderingTrades plugin)
     {
         this.plugin = plugin;
         setup();
@@ -25,7 +25,7 @@ public class TradeListManager
 
     private File listsFolder;
 
-    private Main plugin;
+    private CraftEraSuiteWanderingTrades plugin;
 
     public void loadFiles()
     {
@@ -41,8 +41,7 @@ public class TradeListManager
                     {
                         Collections.addAll(Trades.offers, json);
 
-                        Bukkit.getConsoleSender().sendMessage(
-                                "[CraftEra Suite - Wandering Trades] Loaded file: " + file.getName());
+                        LoggerCore.Log( "LOADED FILE: " + file.getName() );
                     }
                 } catch (FileNotFoundException ex)
                 {
@@ -62,8 +61,7 @@ public class TradeListManager
             plugin.saveResource("trade_lists/heads_decoration.json", false);
             plugin.saveResource("trade_lists/heads_players.json", false);
             plugin.saveResource("trade_lists/items.json", false);
-            Bukkit.getConsoleSender().sendMessage(
-                    "[CraftEra Suite - Wandering Trades] Trade Lists folder created!");
+            LoggerCore.Log( "DONE: Trade Lists folder created" );
         }
     }
 }
