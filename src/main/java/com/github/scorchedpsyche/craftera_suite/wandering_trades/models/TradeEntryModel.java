@@ -10,7 +10,7 @@ public class TradeEntryModel
     private String type = "sell";
     @SerializedName("minecraft_id")
     @Expose
-    private String minecraftId = "elytra";
+    private String minecraftId = "dirt";
     @SerializedName("owner_id")
     @Expose
     private String ownerId;
@@ -22,10 +22,10 @@ public class TradeEntryModel
     private Integer amount = 1;
     @SerializedName("price_item1")
     @Expose
-    private String priceItem1 = "elytra";
+    private String priceItem1 = "diamond";
     @SerializedName("price1")
     @Expose
-    private Integer price1 = 64;
+    private Integer price1 = 1;
     @SerializedName("price_item2")
     @Expose
     private String priceItem2;

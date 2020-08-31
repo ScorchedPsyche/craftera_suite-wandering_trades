@@ -1,6 +1,8 @@
 package com.github.scorchedpsyche.craftera_suite.wandering_trades.listeners;
 
 import com.github.scorchedpsyche.craftera_suite.wandering_trades.CraftEraSuiteWanderingTrades;
+import com.github.scorchedpsyche.craftera_suite.wandering_trades.core.MerchantManager;
+import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.WanderingTrader;
 import org.bukkit.event.EventHandler;
@@ -14,7 +16,20 @@ public class WanderingTraderSpawnListener implements Listener
     {
         if ( event.getEntity().getType() == EntityType.WANDERING_TRADER )
         {
-            CraftEraSuiteWanderingTrades.merchantManager.setMerchantTrades( (WanderingTrader) event.getEntity() );
+            WanderingTrader wanderingTrader = (WanderingTrader) event.getEntity();
+
+            // Should remove default trades?
+            if( CraftEraSuiteWanderingTrades.config.contains("remove_default_trades") &&
+                CraftEraSuiteWanderingTrades.config.getBoolean("remove_default_trades") )
+            {
+                MerchantManager.removeDefaultTrades(wanderingTrader);
+            }
+
+            Bukkit.getScheduler().runTaskAsynchronously(CraftEraSuiteWanderingTrades.getPlugin(CraftEraSuiteWanderingTrades.class), () -> {
+//                Bukkit.getScheduler().runTask(CraftEraSuiteWanderingTrades.getPlugin(CraftEraSuiteWanderingTrades.class), () -> {
+                    CraftEraSuiteWanderingTrades.merchantManager.setMerchantTrades( wanderingTrader );
+//                });
+            });
         }
     }
 }

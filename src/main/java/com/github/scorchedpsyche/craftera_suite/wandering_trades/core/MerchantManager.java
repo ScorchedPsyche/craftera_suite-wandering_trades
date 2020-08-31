@@ -592,22 +592,11 @@ public class MerchantManager
         // Empties trade list to avoid duplicated
         trades = new ArrayList<>();
 
-        // Should remove default trades?
-        if( CraftEraSuiteWanderingTrades.config.contains("remove_default_trades") && CraftEraSuiteWanderingTrades.config.getBoolean("remove_default_trades") )
-        {
-            MerchantManager.removeDefaultTrades( merchant );
-        }
+        if ( !playerHeadsWhitelisted.isEmpty() ) { addWhitelistedPlayersHeadsToOffers(); }
+        if ( !playerHeads.isEmpty() ) { trades.addAll(playerHeads); }
+        if ( !items.isEmpty() ) { trades.addAll(items); }
+        if ( !decorationHeads.isEmpty() ) { trades.addAll(decorationHeads); }
 
-        Bukkit.getScheduler().runTaskAsynchronously(CraftEraSuiteWanderingTrades.getPlugin(CraftEraSuiteWanderingTrades.class), () -> {
-            Bukkit.getScheduler().runTask(CraftEraSuiteWanderingTrades.getPlugin(CraftEraSuiteWanderingTrades.class), () -> {
-
-                if ( !playerHeadsWhitelisted.isEmpty() ) { addWhitelistedPlayersHeadsToOffers(); }
-                if ( !playerHeads.isEmpty() ) { trades.addAll(playerHeads); }
-                if ( !items.isEmpty() ) { trades.addAll(items); }
-                if ( !decorationHeads.isEmpty() ) { trades.addAll(decorationHeads); }
-
-                merchant.setRecipes(trades);
-            });
-        });
+        merchant.setRecipes(trades);
     }
 }
