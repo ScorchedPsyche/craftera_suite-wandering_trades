@@ -125,7 +125,7 @@ public class MerchantManager
      */
     private void loadDecorationHeadRecipe(TradeEntryModel trade)
     {
-        ItemStack decorationHead = createDecorationHead(trade.getAmount(), trade.getTexture());
+        ItemStack decorationHead = createDecorationHead(trade);
 
         // Checks if there are any typos or missing configs on trade files
         if ( isRecipeValid(trade) )
@@ -156,14 +156,14 @@ public class MerchantManager
      * @param texture The texture for the decoration head
      * @return
      */
-    private ItemStack createDecorationHead(int amount, String texture)
+    private ItemStack createDecorationHead(TradeEntryModel trade)
     {
-        ItemStack decorationHead = new ItemStack(Material.PLAYER_HEAD, amount);
+        ItemStack decorationHead = new ItemStack(Material.PLAYER_HEAD, trade.getAmount());
 
         SkullMeta decorationHeadMeta = (SkullMeta) decorationHead.getItemMeta();
 
         GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-        profile.getProperties().put("textures", new Property("textures", texture));
+        profile.getProperties().put("textures", new Property("textures", trade.getTexture()));
 
         Field profileField;
 
@@ -177,6 +177,8 @@ public class MerchantManager
         {
             e1.printStackTrace();
         }
+
+        decorationHeadMeta.setDisplayName( trade.getName() );
         decorationHead.setItemMeta(decorationHeadMeta);
 
         return decorationHead;
@@ -561,6 +563,23 @@ public class MerchantManager
     }
 
     /***
+     * Sets the trades for the Wandering Trader.
+     * @param merchant Target Wandering Trader to have his offers configured
+     */
+    public void setMerchantTrades(WanderingTrader merchant)
+    {
+        // Empties trade list to avoid duplicated
+        trades = new ArrayList<>();
+
+        if ( !playerHeadsWhitelisted.isEmpty() ) { addWhitelistedPlayersHeadsToOffers(); }
+        if ( !playerHeads.isEmpty() ) { trades.addAll(playerHeads); }
+        if ( !items.isEmpty() ) { addItemsToOffers(); }
+        if ( !decorationHeads.isEmpty() ) { addDecorationHeadsToOffers(); }
+
+        merchant.setRecipes(trades);
+    }
+
+    /***
      * Adds whitelisted player's head to Wandering Trader's offers.
      */
     private void addWhitelistedPlayersHeadsToOffers()
@@ -584,19 +603,48 @@ public class MerchantManager
     }
 
     /***
-     * Sets the trades for the Wandering Trader.
-     * @param merchant Target Wandering Trader to have his offers configured
+     * Adds items to Wandering Trader's offers.
      */
-    public void setMerchantTrades(WanderingTrader merchant)
+    private void addItemsToOffers()
     {
-        // Empties trade list to avoid duplicated
-        trades = new ArrayList<>();
+        if( !items.isEmpty() )
+        {
+            Collections.shuffle( items );
 
-        if ( !playerHeadsWhitelisted.isEmpty() ) { addWhitelistedPlayersHeadsToOffers(); }
-        if ( !playerHeads.isEmpty() ) { trades.addAll(playerHeads); }
-        if ( !items.isEmpty() ) { trades.addAll(items); }
-        if ( !decorationHeads.isEmpty() ) { trades.addAll(decorationHeads); }
+            int nbrOfTradesToAdd = items.size();
 
-        merchant.setRecipes(trades);
+            if( nbrOfTradesToAdd > CraftEraSuiteWanderingTrades.config.getInt("maximum_unique_trade_offers.items") )
+            {
+                nbrOfTradesToAdd = CraftEraSuiteWanderingTrades.config.getInt("maximum_unique_trade_offers.items");
+            }
+
+            for (int i = 0; i < nbrOfTradesToAdd; i++)
+            {
+                trades.add( items.get(i) );
+            }
+        }
+    }
+
+    /***
+     * Adds decoration heads to Wandering Trader's offers.
+     */
+    private void addDecorationHeadsToOffers()
+    {
+        if( !decorationHeads.isEmpty() )
+        {
+            Collections.shuffle( decorationHeads );
+
+            int nbrOfTradesToAdd = decorationHeads.size();
+
+            if( nbrOfTradesToAdd > CraftEraSuiteWanderingTrades.config.getInt("maximum_unique_trade_offers.decoration_heads") )
+            {
+                nbrOfTradesToAdd = CraftEraSuiteWanderingTrades.config.getInt("maximum_unique_trade_offers.decoration_heads");
+            }
+
+            for (int i = 0; i < nbrOfTradesToAdd; i++)
+            {
+                trades.add( decorationHeads.get(i) );
+            }
+        }
     }
 }
