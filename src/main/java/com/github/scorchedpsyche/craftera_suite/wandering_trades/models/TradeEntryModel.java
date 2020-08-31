@@ -10,7 +10,10 @@ public class TradeEntryModel
     private String type = "sell";
     @SerializedName("minecraft_id")
     @Expose
-    private String minecraftId = "dirt";
+    private String minecraftId = "Special Dirt Block";
+    @SerializedName("name")
+    @Expose
+    private String name = "dirt";
     @SerializedName("owner_id")
     @Expose
     private String ownerId;
@@ -59,6 +62,14 @@ public class TradeEntryModel
 
     public void setMinecraftId(String minecraftId) {
         this.minecraftId = minecraftId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getOwnerId() {
