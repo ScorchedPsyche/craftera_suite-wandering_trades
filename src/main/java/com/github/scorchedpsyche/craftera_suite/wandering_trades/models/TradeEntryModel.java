@@ -10,10 +10,10 @@ public class TradeEntryModel
     private String type = "sell";
     @SerializedName("minecraft_id")
     @Expose
-    private String minecraftId = "Special Dirt Block";
+    private String minecraftId = "dirt";
     @SerializedName("name")
     @Expose
-    private String name = "dirt";
+    private String name = "Special Dirt Block";
     @SerializedName("owner_id")
     @Expose
     private String ownerId;
