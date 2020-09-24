@@ -53,7 +53,7 @@ public class TradeListManager
 
     public void setup()
     {
-         listsFolder = new File( plugin.getDataFolder(), "trade_lists" );
+        listsFolder = new File( plugin.getDataFolder(), "trade_lists" );
 
         // Create folder to stores lists in
         if( listsFolder.mkdirs() )
